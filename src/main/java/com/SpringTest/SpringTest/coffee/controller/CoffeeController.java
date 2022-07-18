@@ -2,6 +2,10 @@ package com.SpringTest.SpringTest.coffee.controller;
 
 import com.SpringTest.SpringTest.coffee.dto.CoffeePatchDto;
 import com.SpringTest.SpringTest.coffee.dto.CoffeePostDto;
+import com.SpringTest.SpringTest.coffee.dto.CoffeeResponseDto;
+import com.SpringTest.SpringTest.coffee.entity.Coffee;
+import com.SpringTest.SpringTest.coffee.mapper.CoffeeMapper;
+import com.SpringTest.SpringTest.coffee.service.CoffeeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -9,21 +13,33 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/v1/coffees")
+@RequestMapping("/v5/coffees")
 @Validated
 public class CoffeeController {
+    private final CoffeeService coffeeService;
+    private final CoffeeMapper mapper;
+
+    //O coffeeService, CoffeeMapper DI
+    public CoffeeController(CoffeeService coffeeService, CoffeeMapper mapper) {
+        this.coffeeService = coffeeService;
+        this.mapper = mapper;
+    }
+
     //O 커피 정보 등록
     @PostMapping
     public ResponseEntity postCoffee(@Valid @RequestBody CoffeePostDto coffeePostDto) {
-        System.out.println("engName : " + coffeePostDto.getEngName());
-        System.out.println("korName : " + coffeePostDto.getKorName());
-        System.out.println("price : " + coffeePostDto.getPrice());
 
-        return new ResponseEntity<>(coffeePostDto, HttpStatus.CREATED);
+        //O 매퍼를 이용하여 CoffeePostDto를 Coffee로 변환
+        Coffee coffee = mapper.coffeePostDtoToCoffee(coffeePostDto);
+
+        Coffee response = coffeeService.createCoffee(coffee);
+
+        //O 매퍼를 이용하여 Coffee를 CoffeeResponseDto로 변환
+        return new ResponseEntity<>(mapper.coffeeToCoffeeResponseDto(response), HttpStatus.CREATED);
 
     }
 
@@ -33,27 +49,37 @@ public class CoffeeController {
                                       @Valid @RequestBody CoffeePatchDto coffeePatchDto) {
         coffeePatchDto.setCoffeeId(coffeeId);
 
-        return new ResponseEntity<>(coffeePatchDto, HttpStatus.OK);
+        Coffee coffee = mapper.coffeePatchDtoToCoffee(coffeePatchDto);
+
+        Coffee response = coffeeService.updateCoffee(coffee);
+
+        return new ResponseEntity<>(mapper.coffeeToCoffeeResponseDto(response), HttpStatus.OK);
     }
 
     @GetMapping("/{coffee-id}")
-    public ResponseEntity getOrder(@PathVariable("coffee-id") long coffeeId) {
-        System.out.println("coffeeId : " + coffeeId);
+    public ResponseEntity getCoffee(@PathVariable("coffee-id") long coffeeId) {
 
-        return new ResponseEntity(HttpStatus.OK);
+        Coffee response = coffeeService.findCoffee(coffeeId);
+
+        return new ResponseEntity(mapper.coffeeToCoffeeResponseDto(response), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity getMembers() {
-        System.out.println("get Coffees");
+    public ResponseEntity getCoffees() {
+        List<Coffee> coffees = coffeeService.findCoffees();
+        //O List와 Stream, 매퍼를 이용하여 List<Coffee>를 CoffeeResponseDto로 변환
 
-        return new ResponseEntity(HttpStatus.OK);
+        List<CoffeeResponseDto> response = mapper.coffeesToCoffeeResponseDto(coffees);
+
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
 
 
     @DeleteMapping("/{coffee-id}")
-    public ResponseEntity deleteMapping(@PathVariable("coffee-id") long coffeeId) {
+    public ResponseEntity deleteCoffee(@PathVariable("coffee-id") long coffeeId) {
+
+        coffeeService.deleteCoffee(coffeeId);
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
