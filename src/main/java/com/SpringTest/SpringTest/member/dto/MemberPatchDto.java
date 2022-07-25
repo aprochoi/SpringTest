@@ -10,7 +10,6 @@ import javax.validation.constraints.Pattern;
 @Getter
 public class MemberPatchDto {
     private long memberId;
-    private String email;
 
     @NotSpace(message = "회원 이름은 공백이 아니어야 합니다.")
     private String name;

@@ -1,5 +1,7 @@
 package com.SpringTest.SpringTest.member.service;
 
+import com.SpringTest.SpringTest.exception.BusinessLogicException;
+import com.SpringTest.SpringTest.exception.ExceptionCode;
 import com.SpringTest.SpringTest.member.entity.Member;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +29,9 @@ public class MemberService {
         // TODO should business logic
 
         // O member 객체는 나중에 DB에 저장 후, 되돌려 받는 것으로 변경 필요.
-        Member member = new Member(memberId, "ym24319577@gmail.com", "최영민", "010-2431-9577");
-        return member;
+//        Member member = new Member(memberId, "ym24319577@gmail.com", "최영민", "010-2431-9577");
+//        return member;
+        throw new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND);
     }
 
     public List<Member> findMembers() {

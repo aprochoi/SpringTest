@@ -5,8 +5,8 @@ import com.SpringTest.SpringTest.member.dto.MemberPatchDto;
 import com.SpringTest.SpringTest.member.dto.MemberPostDto;
 import com.SpringTest.SpringTest.member.dto.MemberResponseDto;
 import com.SpringTest.SpringTest.member.entity.Member;
-//import com.SpringTest.SpringTest.member.mapper.MemberMapper;
 import com.SpringTest.SpringTest.member.service.MemberService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -15,11 +15,12 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/v5/members")
 @Validated
+@Slf4j
 public class MemberController {
     private final MemberService memberService;
     private final MemberMapper mapper;
@@ -32,8 +33,9 @@ public class MemberController {
     //O 회원 정보 등록
     @PostMapping
     public ResponseEntity postMember(@Valid @RequestBody MemberPostDto memberPostDto) {
+        Member member = mapper.memberPostDtoToMember(memberPostDto);
         //O (2) 매퍼를 이용해 MemberPostDto를 Member로 변환
-        Member response = memberService.createMember(mapper.memberPostDtoToMember(memberPostDto));
+        Member response = memberService.createMember(member);
 
         return new ResponseEntity<>(mapper.memberToMemberResponseDto(response), HttpStatus.CREATED);
     }
