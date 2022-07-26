@@ -3,6 +3,7 @@ package com.SpringTest.SpringTest.member.service;
 import com.SpringTest.SpringTest.exception.BusinessLogicException;
 import com.SpringTest.SpringTest.exception.ExceptionCode;
 import com.SpringTest.SpringTest.member.entity.Member;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,5 +48,8 @@ public class MemberService {
 
     public void deleteMember(long memberId) {
         // TODO should business logic
+
+        String logResult = null;
+        System.out.println(logResult.toUpperCase());
     }
 }

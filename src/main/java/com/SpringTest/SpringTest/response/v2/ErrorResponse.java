@@ -1,6 +1,8 @@
 package com.SpringTest.SpringTest.response.v2;
 
+import com.SpringTest.SpringTest.exception.ExceptionCode;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
@@ -11,8 +13,17 @@ import java.util.stream.Collectors;
 
 @Getter
 public class ErrorResponse {
+    private Integer status;
+    private String message;
     private List<FieldError> fieldErrors;
     private List<ConstraintViolationError> violationErrors;
+
+
+
+    public ErrorResponse(Integer status, String message) {
+        this.status = status;
+        this.message = message;
+    }
 
     private ErrorResponse(List<FieldError> fieldErrors, List<ConstraintViolationError> violationErrors) {
         this.fieldErrors = fieldErrors;
@@ -25,6 +36,14 @@ public class ErrorResponse {
 
     public static ErrorResponse of(Set<ConstraintViolation<?>> violations) {
         return new ErrorResponse(null, ConstraintViolationError.of(violations));
+    }
+
+    public static ErrorResponse of(ExceptionCode exceptionCode) {
+        return new ErrorResponse(exceptionCode.getStatus(), exceptionCode.getMessage());
+    }
+
+    public static ErrorResponse of(HttpStatus httpStatus) {
+        return new ErrorResponse(httpStatus.value(), httpStatus.getReasonPhrase());
     }
 
     @Getter
